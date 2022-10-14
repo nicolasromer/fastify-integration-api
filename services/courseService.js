@@ -28,7 +28,7 @@ module.exports = {
 	get(courseId) /* Promise */ {
 		return fetch(baseUrl + courseId)
 	    	.then(response => response.json())
-	    	.then(mapCourse);		
+	    	.then(mapCourse);
 	},
 }
 
