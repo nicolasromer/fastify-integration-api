@@ -3,18 +3,10 @@
 const { test } = require('tap')
 const { build } = require('../helper')
 
-// test('lepaya-courses root is loaded', async (t) => {
-//   const app = await build(t)
-
-//   const res = await app.inject({
-//     url: '/api/lepaya-courses'
-//   })
-//   t.equal(res.payload, 'Lepaya course api')
-// })
-
 test('can fetch a course', async (t) => {
   const app = await build(t)
 
+  // todo: mock data
   const res = await app.inject({
     url: '/api/lepaya-courses/ef131a0c-3006-4a38-8cfd-085fa08f8361'
   })
@@ -58,3 +50,10 @@ test('can fetch a course', async (t) => {
     })
   )
 })
+
+// tests todo:
+// 404
+// 500
+// no learners
+// no trainer
+// one or more timeouts

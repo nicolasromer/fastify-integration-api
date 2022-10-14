@@ -1,47 +1,32 @@
 'use strict'
-
+const courseService = require("../../services/courseService.js");
+const trainerService = require("../../services/trainerService.js");
+const learnerService = require("../../services/learnerService.js");
 const fetch = require("node-fetch");
 
-// module.exports = async function (fastify, opts) {
-//   fastify.get('/', async function (request, reply) {
-//     return 'Lepaya course api'
-//   })
-// }
+const trainerTransformer = ({id, name}) => {id, name}
+const learnerTransformer = ({id, name}) => {id, name}
+const courseTransformer = ({id, title, date}, trainer, learners) => ({
+  id,
+  title,
+  date: date.toISOString(),
+  trainer: trainerTransformer(trainer),
+  learners: learners.map(learnerTransformer(learner)),
+})
 
 module.exports = async function (fastify, opts) {
-  fastify.get('/:courseUid', async function (request, reply) {
-    const { courseUid } = request.params;
-
-    const baseUrl = 'https://kbfszrxx5vacidgrgdhqzu25r40vyyuw.lambda-url.eu-central-1.on.aws/api';
+  fastify.get('/:courseId', async function (request, reply) {
+    const { courseId } = request.params;
     
-    const courseUrl = baseUrl + '/courses/' + courseUid;
-    const course = await fetch(courseUrl)
-      .then(response => response.json());
-
+    const course = await courseService.get(courseId)
    
-    const { trainerId, learners } = course;
+    const [trainer, learners] = await Promise.all([
+      trainerService.get(course.trainerId),
+      learnerService.getAll(course.learnerIds)
+    ]);   
 
-    const trainerUrl = baseUrl + '/trainers/' + trainerId;
-    const trainerPromise = fetch(trainerUrl)
-      .then(response => response.json());
+    const courseRepresentation = courseTransformer(course, trainer, learners);
 
-    const learnersUrl = baseUrl + '/learners';
-    const learnersPromise = fetch(learnersUrl)
-      .then(response => response.json());
-
-    const [trainerData, learnersData] = await Promise.all([trainerPromise, learnersPromise]);
-
-    const relevantLearners = learnersData.learners.filter(learner => course.learners.includes(learner.id) )
-
-
-    const {id, title, date} = course;
-
-    const payload = {
-      id, title, date,
-      trainer: trainerData,
-      learners: relevantLearners,
-    };
-
-    reply.send(payload);
+    reply.send(courseRepresentation);
   })
 }
