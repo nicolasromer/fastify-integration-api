@@ -21,6 +21,13 @@ module.exports = {
 			.then(response => response.json())
 			.then(data => data.learners.map(mapLearner))
 			.then(learners => learners.filter(learner => learnerIds.includes(learner.id)));
-	}
+	},
+	transform: ({id, name} /*: Learner */) /* : LearnerRepresentation */ => ({
+  		id, 
+  		name,
+	}),
+	transformAll(learners /* Learner[] */) /* : LearnerRepresentation[] */ {
+		return learners.map(this.transform)
+	},
 }
 

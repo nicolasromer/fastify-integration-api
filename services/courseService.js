@@ -30,5 +30,10 @@ module.exports = {
 	    	.then(response => response.json())
 	    	.then(mapCourse);
 	},
+	transform: ({id, title, date} /*: Course */) /* : CourseRepresentation */ => ({
+  		id, 
+  		title,
+  		date: date.toISOString(),
+	}),
 }
 

@@ -20,6 +20,10 @@ module.exports = {
 		return fetch(baseUrl + trainerId)
 			.then(response => response.json())
 			.then(mapData);
-	}
+	},
+	transform: ({id, name} /*: Trainer */) /* : TrainerRepresentation */ => ({
+  		id, 
+  		name,
+	}),
 }
 
